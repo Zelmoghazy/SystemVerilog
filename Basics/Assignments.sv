@@ -12,6 +12,14 @@
  *    - LHS should always be a reg or a vector of reg.
  *    - RHS can be of type reg or wire .
  * 
+ * Continuous
+ *    - Signals of type wire require continuous assignment of a value.
+ *    - Used when you connect gates together.
+ *    - LHS should always be a wire or a vector of wires (It can never be reg).
+ *    - RHS can be of type reg or wire. 
+ *    - The assignment is always active.
+ *      Whenever any operand on the RHS changes in value, LHS will be updated with the new value.
+ *
  *
  */
 
@@ -21,7 +29,10 @@ module test;
     int c;
     int d;
     int e;
+    int f;
 
+    assign f = a;
+    
     initial begin
         a <= 5;
         b <= 23;
@@ -43,7 +54,7 @@ module test;
     end
 
     initial begin
-        $dumpfile("test.vsd");
+        $dumpfile("test.vcd");
         $dumpvars;
     end
 endmodule

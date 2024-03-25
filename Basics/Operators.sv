@@ -1,3 +1,16 @@
+/* 
+    Operator Precedence
+    -------------------
+        1- Unary, Multiply, Divide, Modulus
+        2- Add, Subtract, Shift.
+        3- Relation, Equality
+        4- Reduction
+        5- Logic
+        6- Conditional
+
+ */
+
+
 // Relational Operators
 module relational;
     reg [7:0] a;
