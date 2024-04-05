@@ -7,6 +7,7 @@ module logic_data_type();
    It is given the synonym logic so that it does not look like a register declaration. 
     - A logic type is a 4-state type (1,0,x,z)
     - A logic signal can be used anywhere a net is used
+    - A logic signal can only have one driver
 */
 
   logic q;

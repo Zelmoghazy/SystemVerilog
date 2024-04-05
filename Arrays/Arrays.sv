@@ -18,6 +18,8 @@ module arrays_1 ();
     int array2 [0:7][0:3]; // Verbose declaration
     int array3 [8][4];     // Compact declaration
 
+    reg[3:0] array4 [4];   // Array of 4 registers each is 4-bits
+
     initial begin
         lo_hi  [3]    = 234 ; // Set one array element
         array2 [7][3] = 1;    // Set last array element
@@ -67,16 +69,82 @@ module arrays_3 () ;
     end
 endmodule
 
+/* 
+    foreach for a two-dimensional array, it must be written as follows:
+         array_name[i,j], not array_name[i][j]
+
+    In the normal use of the multi-dimensional array, each index must be
+    written in a separate pair of square brackets. i.e. array_name[i][j].
+*/
 module arrays_4();
     initial begin
-        int two_d[3][5];
+        int two_d[3][5];            // 3 rows and 5 columns
+
+        // initialize 2d array with default elements
+        two_d = '{'{default:1},'{default:2},'{default:3}};
+
+        foreach (two_d[i]) begin    // Step through the rows
+            $write ("%2d:",i);      // write in a buffer
+            foreach (two_d[,j])     // Step through the columns
+                $write("%3d",two_d[i][j]);
+            $display;
+        end
+
+        // initialize 2d array
         foreach (two_d[i,j])
             two_d[i][j] = 10*i+j;
-        foreach (two_d[i]) begin
-            $write ("%2d:",i);
-            foreach (two_d[,j]) 
-                $write ("%3d",two_d[i][j]);
-            $display
+
+        foreach (two_d[i]) begin    // Step through the rows
+            $write ("%2d:",i);      // write in a buffer
+            foreach (two_d[,j])     // Step through the columns
+                $write("%3d",two_d[i][j]);
+            $display;
         end
     end
+endmodule
+
+/* 
+    You can perform aggregate compare and copy of arrays without loops. 
+    (An aggregate operation works on the entire array as opposed to working 
+    on just an individual element.)
+        - Comparisons are limited to just equality and inequality.
+        - You cannot perform aggregate arithmetic operations such as addition on arrays.
+
+*/
+module arrays_5 ();
+    initial begin
+        bit [31 :0] src [5] = '{0, 1, 2, 3, 4};
+        bit [31 :0] dst [5] = '{5, 4, 3, 2, 1};
+
+        // Aggregate compare the two arrays
+        if (src==dst)
+            $display("src = dst");
+        else
+            $display("src != dst");
+        
+        // Aggregate copy all src values to dst
+        dst = src;
+        $display ("src %s dst" , (src == dst) ? "==" : "!=") ;
+
+        // Change just one element
+        src [0] = 5;
+        $display ("src %s dst" , (src == dst) ? "==" : "!=") ;
+
+        // Use array slice to compare elements 1-4
+        $display("src [1:4] %s dst [1:4]", (src [1 :4] == dst [1 :4]) ? "==" : "!=") ;
+    end
+endmodule
+
+module arrays_6 ();
+    initial begin
+        bit [31 :0] src [5] = '{5{5}};
+
+        foreach (src[j])
+            $displayb("src[%0d] = %b",j,src[j]);  // display in binary format.
+        
+        // prints the first array element (binary 101), its lowest bit (1), and the next two higher bits (binary 10).
+        $displayb(src[0],,src[0][0],,src[0][2:1]); // two comas “, ,”  to leave a blank space
+        
+    end
+
 endmodule

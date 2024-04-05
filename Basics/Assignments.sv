@@ -19,6 +19,7 @@
  *    - RHS can be of type reg or wire. 
  *    - The assignment is always active.
  *      Whenever any operand on the RHS changes in value, LHS will be updated with the new value.
+ *    - wires with multiple drivers bits with different values take the value x
  *
  *
  */
