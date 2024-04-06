@@ -148,3 +148,19 @@ module arrays_6 ();
     end
 
 endmodule
+
+module arrays_7;
+  bit [12:0] dt_bit[4];
+  
+  initial begin
+    dt_bit = '{12'h012,12'h345,12'h678,12'h9AB};
+    
+    for(int i =0; i<$size(dt_bit); i++)
+    /* print out first byte only */
+      $display("%x",dt_bit[i][3:0]);
+    
+    foreach(dt_bit[i])
+      $display("%x",dt_bit[i][3:0]);
+    
+  end
+endmodule

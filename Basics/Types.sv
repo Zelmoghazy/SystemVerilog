@@ -112,3 +112,23 @@ module exp_width();
         $displayb(2'(one) + one); //2
     end
 endmodule
+
+module test;
+  byte dt_byte;
+  integer dt_integer;
+  int dt_int ;
+  
+  bit [15:0] dt_bit;
+  shortint dt_short_intl;
+  shortint dt_short_int2;
+  initial begin
+	dt_integer = 32'b0000_1111_xxxx_zzzz;
+    dt_int = dt_integer;
+    
+    $display("%32b",dt_int);
+    
+    dt_bit = 16'h8000;
+    dt_short_intl = dt_bit;
+    dt_short_int2 = dt_short_intl-1;
+  end
+endmodule
