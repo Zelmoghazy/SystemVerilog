@@ -78,3 +78,37 @@ module state_data_type();
         $dumpvars;
     end
 endmodule
+
+/*  
+    Verilog has always implicitly converted between types 
+    such as integer and real, and also between different width vectors.
+*/
+module type_conversion () ;
+    initial begin
+        int  i;
+        real r;
+
+        i = int'(10.0 - 0.6) ;  // optional cast
+        r = real'(42) ;        // optional cast
+
+        $display ("i = ",i);
+        $display ("r = ",r);
+    
+    end
+endmodule
+
+module exp_width();
+    bit[7:0] b8;
+    bit one = 1'b1;
+
+    initial begin
+        $displayb(one + one); //0
+
+        b8 = one + one;
+        $displayb(b8); // 2
+
+        $displayb(one + one + 2'b0); //2
+
+        $displayb(2'(one) + one); //2
+    end
+endmodule

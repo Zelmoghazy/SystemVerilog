@@ -1,9 +1,8 @@
 /*
-    A dynamic array is declared with empty word square brackets [ ] 
-    This means that you do not specify the array size in advance; instead, you give it at run-time.
+    - A dynamic array is declared with empty word square brackets [ ] 
+      This means that you do not specify the array size in advance; instead, you give it at run-time.
 
-    The array is initially empty, and so you must call the new[ ] constructor to allocate space
-
+    - The array is initially empty, and so you must call the new[ ] constructor to allocate space
 */
 
 module dyn_arrays ();
@@ -13,7 +12,6 @@ module dyn_arrays ();
 
     int da1[];
     int da2[];
-    int da_concat[];
 
     initial begin
         dyn = new [5];       // Allocate 5 elements
@@ -45,10 +43,31 @@ module dyn_arrays ();
         foreach (da2[j])     
             da2[j] = 10+j;      // Initialize elements
         
-        da_concat = new[20];
-        da_concat = {da1,da2};
-        $display(da_concat);
+        $display(da1.size());
+
+        da1 = {da1,da2};
+
+        $display(da1.size());
+
+        $display(da1);
 
     end
 endmodule
 
+
+module dyn_arrays ();
+    int dyn[][];
+
+    initial begin
+        dyn = new[2];
+
+        foreach(dyn[i])
+            dyn[i] = new[3];
+
+        dyn = '{'{1,12,15},'{3,7,14}};
+
+        foreach(dyn[i])
+            $display(dyn[i]);
+    end
+
+endmodule

@@ -2,7 +2,6 @@
     - associative arrays allow any data type to be used as the index.
     - good solution when you want to access few location on a very large address space
     - Associative arrays dont have any storage allocated until it is used.
-
 */
 
 module associative_1();
@@ -19,6 +18,7 @@ module associative_1();
         scoreboard["cpu"]     = 150;
 
         $display("number of elements of associative array = %d",scoreboard.num());
+        $display("number of elements of associative array = %d",scoreboard.size());
 
         expected_output = scoreboard["cpu"];
         $display(expected_output);

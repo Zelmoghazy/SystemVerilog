@@ -18,13 +18,12 @@ module arrays_1 ();
     int array2 [0:7][0:3]; // Verbose declaration
     int array3 [8][4];     // Compact declaration
 
-    reg[3:0] array4 [4];   // Array of 4 registers each is 4-bits
+    reg[3:0] array4[4];   // Array of 4 registers each is 4-bits
 
     initial begin
         lo_hi  [3]    = 234 ; // Set one array element
         array2 [7][3] = 1;    // Set last array element
     end
-    
 endmodule
 
 module arrays_2 () ;
@@ -33,10 +32,11 @@ module arrays_2 () ;
     which is an apostrophe followed by the values in curly braces. '{} 
 */ 
     int ascend  [4] = '{0,1,2,3}; // Initialize 4 elements
-    int descend [5] ;
+    int descend [5] ;           
+
     initial begin
         $display("1: ascend  : ", ascend) ;
-        $display("2: descend : ", descend) ;
+        $display("2: descend : ", descend) ;  // default value = zeroes -> int is 2-state
 
         descend = '{4,3,2,1,0};   // Set 5 elements
         $display("3: descend : ", descend) ;
