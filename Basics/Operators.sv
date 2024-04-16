@@ -344,7 +344,7 @@ endmodule
     - Left-to-right streaming using >> shall cause the slice_size to be ignored and no re-ordering performed.
 */
 
-module arrays () ;
+module streaming_1() ;
     initial begin
         byte a = 8'h8C;
         byte b = 8'h00;
@@ -358,7 +358,7 @@ module arrays () ;
 endmodule
 
 
-module arrays() ;
+module streaming_2() ;
     initial begin
         bit [7:0] array [4] = '{8'h8c, 7'h00, 8'hA4, 8'hFF} ;
         $display(array) ;

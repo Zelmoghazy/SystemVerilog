@@ -80,6 +80,9 @@ module state_data_type();
 endmodule
 
 /*  
+    The static cast operation converts between two types with no checking of values.
+    You specify the destination type, an apostrophe, and the expression to be converted 
+
     Verilog has always implicitly converted between types 
     such as integer and real, and also between different width vectors.
 */
@@ -89,7 +92,7 @@ module type_conversion () ;
         real r;
 
         i = int'(10.0 - 0.6) ;  // optional cast
-        r = real'(42) ;        // optional cast
+        r = real'(42) ;         // optional cast
 
         $display ("i = ",i);
         $display ("r = ",r);
@@ -131,4 +134,40 @@ module test;
     dt_short_intl = dt_bit;
     dt_short_int2 = dt_short_intl-1;
   end
+endmodule
+
+/* Creating new types */
+
+module types;
+
+    parameter OPSIZE = 8;
+
+    typedef reg [OPSIZE-1:0] opreg_t ; // define a new type
+
+    opreg_t opreg_a;
+    opreg_t opreg_b;
+
+
+    /* 
+        One of the most useful types you can create 
+        is an unsigned, 2-state, 32-bit integer.
+     */
+    typedef bit [31:0] uint;    // 32-bit unsigned 2-state
+    typedef int unsigned uint1; // Equivalent definition
+
+    uint  rega;
+    uint1 regb;
+
+    typedef int fixed_array_5[5];
+
+    fixed_array_5 f5;
+
+    initial begin
+        foreach(f5[i])
+            f5[i]=i;
+        $displayb ("Unnitialized opreg_a: " , opreg_a) ;
+        $displayb ("Unnitialized rega: " , rega) ;
+        $display("Initalized f5: ", f5 ) ;
+    end
+
 endmodule
