@@ -32,7 +32,7 @@ endmodule
 
 
 
-module test () ;
+module task_2 () ;
     /*  The direction and type default to "input logic“. */
     task mytask(output reg [31 :0] x,input  reg [31 :0] y);
         x = y<<2 ;
@@ -50,6 +50,7 @@ module tasks_3() ;
     task many(input int a=1 , b=2 , c=3 , d=4) ;
         $display( "%0d %0d %0d %0d" , a, b, c, d) ;
     endtask
+
     initial begin
         many(6, 7, 8, 9);
         many();
@@ -59,11 +60,11 @@ module tasks_3() ;
     end
 endmodule
 
-module test () ;
+module task_4 () ;
     task load_array(int len, ref int array[]) ;
-        /* The task in the shown code needs to return early because of error checking. */
+        /* The task needs to return early because of error checking. */
         if (len <= 0) begin
-            $display ("Bad len!") ;
+            $display ("Bad len!");
             return;
         end
         // Rest of task code
@@ -76,7 +77,7 @@ module test () ;
     initial begin
         int a[];
         a = new[5];
-        load_array(0,a) ;
+        load_array(0, a) ;
         $display("------------") ;
         load_array(5, a);
     end

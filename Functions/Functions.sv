@@ -36,10 +36,16 @@ module functions_1();
     end
 endmodule
 
+/* Note that the default type for the first argument is a single-bit input 
+   Argument type is sticky with respect to the previous argument.
+        - task sticky(int a, b); The two arguments are input integers
+        - task sticky(ref int array [50] , int a, b); a is ref int and b is ref int
+*/
+
 module functions_2 () ;
     function void print_checksum(ref bit [31 :0] a [] ,
-                                input bit [31 :0] low = 0 ,  // default argument value
-                                input int high = -1) ;
+                                 input bit [31 :0] low = 0 ,  // default argument value
+                                 input int high = -1) ;
 
         bit [31 :0] checksum;
         checksum = 0;
@@ -49,11 +55,13 @@ module functions_2 () ;
 
         for (int i = low; i<=high; i++)
             checksum += a[i] ;
+
         $display ("The array checksum is %0d", checksum);
     endfunction
 
     initial begin
         bit [31 :0] w[] = {21, 17, 7, 50, 10};
+
         print_checksum (w);
         print_checksum (w,2,4);     // checksum a[2:4]
         print_checksum (w,1);
@@ -64,11 +72,11 @@ endmodule
 
 /* Returning an array from a function */
 
-module test_1 () ;
-    typedef int fixed_array5[5]; // define a type
+module functions_3 () ;
+    typedef int fixed_array5[5];  // define a type
     fixed_array5 f5;              // declare a variable
     
-    function fixed_array5 init (int start) ; // consumes memory
+    function fixed_array5 init (int start) ; // consumes memory -> copy
         foreach (init [i])
             init[i] = i + start;
     endfunction
@@ -78,16 +86,19 @@ module test_1 () ;
             the function init creates an array, which is copied into the array f5.
             If the array was large, this could be a large performance problem.
          */
-        f5 = init(5) ; // two memory spaces are consumed
+        f5 = init(5); // two memory spaces are consumed
         foreach(f5[i])
             $display("f5[%0d] = %0d" , i, f5[i]) ;
     end
 endmodule
 
+/*  
+    Here init takes a reference to the array and populate it
+ */
 module test_2();
     function void init (ref int f[5], input int start) ;
         foreach(f[i])
-            f [i] = i + start;
+            f[i] = i + start;
     endfunction
 
     int fa[5] ; // only one memory space is consumed
