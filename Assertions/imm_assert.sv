@@ -20,9 +20,9 @@ module test (count_ifc x);
         assertion1: assert(x.Q == 4'b0000)
             $display("The output value is correct");
         else
-            $fatal("The reset is not synchronous");
+            $fatal("The reset is not synchronous");  // Stop execution at this point.
 
-        #6 x.MR<= 1'b0;
+        #6  x.MR<= 1'b0;
 
         #43 Enable <= 1'b0;
         #15 Enable <= 1'b1;
@@ -34,11 +34,11 @@ endmodule
 
 /* Severity System Tasks */
 module test_module ;
-initial begin
-    #5 $info("Starting simulation...") ;
-    #5 $warning("This is a warning message...") ;
-    #5 $error("This is an error message. ") ;
-    #5 $fatal("This is a fatal error message. ") ; // Simulation will terminate here
-    #5 $info("Simulation ended. ") ;               // This will not be executed due to the previous $fatal
-end
+    initial begin
+        #5 $info("Starting simulation...") ;
+        #5 $warning("This is a warning message...") ;
+        #5 $error("This is an error message.") ;
+        #5 $fatal("This is a fatal error message.") ;  // Simulation will terminate here
+        #5 $info("Simulation ended.") ;                // This will not be executed due to the previous $fatal
+    end
 endmodule

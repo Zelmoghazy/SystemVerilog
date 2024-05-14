@@ -1,12 +1,50 @@
 /* 
-    Functions have only input arguments, and the function returns a value, and the
-    value must be used, as in an assignment statement. Sometimes the function is
-    void, i.e. it returns no value.
 
-    A function cannot have a :
-    - delay, #100
-    - a blocking statement such as @(posedge clock) or wait (ready),
-    - call a task.
+    function mem_mode return_type function_name (direction_of_arg arg_data_type arg_name, ... );
+        begin
+            // code
+            function_name = returned_value;  // if you want to return value at the end of function execution
+
+            return returned_value;           // immediately end function execution and return value
+
+        end
+    endfunction
+
+    - mem_mode: static or automatic (default : static)
+    - return_type: type+length, can't be "wire", can be "void" if you dont want to return (default: logic)
+    - function_name : variable naming rules
+    - direction of arg: input, output, inout
+    - arg_data_type: type+length, cant be "wire" (default: logic)
+    - arg_name: variable naming rules
+
+    * Example :
+
+        function static int sum (input int x, input int y);
+            begin 
+                automatic int result;
+                result = x+y;
+
+                sum =  result;
+            end
+        endfunction
+
+    -   An argument can have only one direction: input, output, inout, or ref. 
+        If you don’t specify a direction for the first argument, it is implicitly ‘input’.
+        The implicit directions for the arguments that follow use the previous arguments direction.
+
+    -   inputs are copied by value upon entry to the task/function.
+    -   outputs are copied on return.
+    -   inout are copied on entry and return.
+    -   ref arguments are never copied. They are direct references to the actual argument variable.    
+
+    -   Functions have only input arguments, and the function returns a value, 
+        and the value must be used, as in an assignment statement. 
+        Sometimes the function is void, i.e. it returns no value.
+
+    - A function cannot have a :
+        - delay, #100
+        - a blocking statement such as @(posedge clock) or wait (ready),
+        - call a task.
 
     In SystemVerilog, if you want to call a function and ignore its return value, cast
     the result to void, as follows:

@@ -81,3 +81,40 @@ module queue_3();
         $display(queue);
     end
 endmodule
+
+module queue_4;
+  // Declare a parameter for the maximum number of elements
+  parameter MAX_ELEMENTS = 256;
+
+  initial begin
+    // adding an upper bound to the queue
+    // Addition of new element beyond the upper bound of the queue shall be ignored.
+    int my_queue[$:MAX_ELEMENTS];
+
+    int i;
+    for (i = 0; i < MAX_ELEMENTS; i++) begin
+      my_queue.push_back($random);
+    end
+    // Display the queue contents
+    $display("Queue contents:");
+    foreach (my_queue[i]) begin
+      $display("%d", my_queue[i]);
+    end
+  end
+endmodule
+
+module queue_5();
+    int c[$], b[$], a[$] = '{6,9,23,63,2,6,1,1,2,7};
+
+    initial begin
+        int i;
+        $display(a);
+        b = a.unique();
+        while(b.size() != 0) begin
+            i = $urandom_range(0,b.size()-1);
+            c.push_front(b[i]);
+            b.delete(i);
+        end
+        $display(c);
+    end
+endmodule
