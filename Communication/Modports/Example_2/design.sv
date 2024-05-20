@@ -18,11 +18,11 @@ module top;
     bit clk;
     always #5 clk <= ~clk;
 
-    count_ifc ifc(clk);
+    count_ifc ifc(clk);     // instantiate the interface
     
     // when you make an instance from the DUT or the testbench, you select the convenient modport
-    decade_counter u1(ifc.dut) ;
-    test u2(ifc.driver);
+    decade_counter u1(ifc.dut) ; // instantiate the design with suitable modport
+    test u2(ifc.driver);         // intantiate the test bench with suitable modport
     
     initial begin
         $dumpfile("counter.vcd") ;

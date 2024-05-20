@@ -19,8 +19,8 @@ module test (count_ifc x);
         x.Enable <= 1'b1 ;
         x.Load   <= 1'b0;
 
-        #3 x.MR<= 1'b1;
-        #6 x.MR<= 1'b0;
+        #3 x.MR <= 1'b1;
+        #6 x.MR <= 1'b0;
 
         #43 Enable <= 1'b0;
         #15 Enable <= 1'b1;

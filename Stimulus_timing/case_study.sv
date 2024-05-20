@@ -1,38 +1,44 @@
 /* 
-    An interface block can use a clocking block to specify the timing of synchronous
-    signals relative to the clocks.
+    - An interface block can use a clocking block to specify the timing of synchronous
+      signals relative to the clocks.
 
-    Any signal in a clocking block is now driven or sampled synchronously, ensuring
-    that your testbench interacts with the signals at the right time.
+    - Any signal in a clocking block is now driven or sampled synchronously, ensuring
+      that your testbench interacts with the signals at the right time.
 
-    If you have multiple clock domains, an interface can contain multiple clocking
-    blocks, one per clock domain, as there is single clock expression in each block.
+    - If you have multiple clock domains, an interface can contain multiple clocking
+      blocks, one per clock domain, as there is single clock expression in each block.
  */
 
 
 interface intf (input clk);
     logic read, enable;
-    logic [7:0] addr,data;
+    logic [7:0] addr, data;
 
     // clocking block for testbench
+    // Any signal in a clocking block is now driven or sampled synchronously
     clocking cb @(posedge clk) ;
         default input #10ns output #2ns;
+
         output read,enable,addr;
         input data;
     endclocking
 
-    modport dut(input read,enable,addr,output data);
+    // Modport Declaration
+    modport dut(input read, enable, addr, output data);
+    // Synchronous testbench modport, add timing constraints in addition to access restrictions.
+    modport tb (clocking cb); 
 
-    // Synchronous testbench modport
-    modport tb (clocking cb);
 endinterface :intf
 
+// Design Under Test
+module memory(intf abc);
 
-module memory(intf abc) ;
-    logic [7:0] mem [256] ;
+    logic [7:0] mem [256]; // 2^8
+
     initial begin
+        // fill memory with index/2
         foreach (mem [i])
-            mem [i] = i >> 1;
+            mem[i] = i >> 1;
     end
 
     always @(abc.enable, abc.read) begin
@@ -42,15 +48,17 @@ module memory(intf abc) ;
 endmodule
 
 
-module testbench (intf xyz) ;
+module testbench (intf xyz);
+
     logic [7:0] cbdata;
 
     initial begin
-        xyz.cb.read   <= 1;       // driving a synchronous signal
-        xyz.cb.enable <= 1;       // driving a synchronous signal
-        xyz.cb.addr   <= 70;      // driving a synchronous signal
+        xyz.cb.read   <= 1;       // driving a synchronous signal, according to timing constraints in clocking block
+        xyz.cb.enable <= 1;       // driving a synchronous signal, according to timing constraints in clocking block
+        xyz.cb.addr   <= 70;      // driving a synchronous signal, according to timing constraints in clocking block
+
         #30 xyz.cb.addr <= 150; 
-        #25 xyz.data    <= 67;    // disturbing the DUT data
+        #25 xyz.data    <= 67;    // disturbing the DUT data, notice that its reflected at once.
         #40 xyz.cb.addr <= 5;
     end
     always @(xyz.cb)
