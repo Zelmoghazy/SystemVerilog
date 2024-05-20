@@ -16,27 +16,31 @@
 
         -  Overlapped implication (|->)
             - If there is a match on the antecedent, then the consequent expression is evaluated in the same clock cycle.
-            - assert property (@(posedge clk) a|-> b); checks that, if signal “a” is high on a given positive clock
-            edge, then signal “b” should also be high on the same clock edge
+            - assert property (@(posedge clk) a|-> b); 
+                - checks that, if signal “a” is high on a given positive clock edge,
+                  then signal “b” should also be high on the same clock edge
 
         - Non-Overlapped Implication (|=>)
-            -  If there is a match on the antecedent, then the consequent expression is evaluated in the next clock cycle.
-            - assert property (@(posedge clk) a|=> b); checks that, if signal “a” is high on a given positive clock
-            edge, then signal “b” should also be high on the next clock edge.
+            - If there is a match on the antecedent, then the consequent expression is evaluated in the next clock cycle.
+            - assert property (@(posedge clk) a|=> b);
+                - checks that, if signal “a” is high on a given positive clock edge,
+                  then signal “b” should also be high on the "next" clock edge.
     
     - Implication with a fixed delay on the consequent
         - assert property (@(posedge clk) a|-> ##2 b);
-            - This property checks, if signal a is high on a given positive clock edge, then signal b should be high after exactly 2 c/oc/c cycles.
+            - This property checks, if signal a is high on a given positive clock edge,
+              then signal b should be high after exactly 2 clock cycles.
 
     - Implication with a delay range on the consequent
         - assert property (@(posedge clk) a|-> ##[1:4] b);
-            - This property checks, if signal a is high on a given positive clock edge, then within 1 to 4 clock
-            cycles, the signal b should be high.
+            - This property checks, if signal a is high on a given positive clock edge,
+              then within 1 to 4 clock cycles, the signal b should be high.
 
     - Implication with an infinite timing window on the consequent (eventuality operator)
         - assert property (@(posedge clk) a|-> ##[1:$] b);
-            - This property checks, if signal a is high on a given positive clock edge, then signal b will be high
-            eventually starting from the next clock cycle.
+            - This property checks, if signal a is high on a given positive clock edge,
+              then signal b will be high eventually starting from the next clock cycle.
+
  */
 
  module decade_counter (counter_ifc y);
@@ -58,7 +62,7 @@ endmodule
 
 module test (count_ifc x);
     initial begin
-        x.P      <= 4'b0111;
+        x.P      <= 4'b0101;
         x.MR     <= 1'b0;
         x.Enable <= 1'b1 ;
         x.Load   <= 1'b0;
@@ -66,11 +70,17 @@ module test (count_ifc x);
         #3 x.MR<= 1'b1;
         #6 x.MR<= 1'b0;
 
-        #43 Enable <= 1'b0;
-        #15 Enable <= 1'b1;
+        #12 x.Load <= 1'b1 ;
+        #9  x.Load <= 1'b0 ;
 
-        #16 Load <= 1'b1 ;
-        #9  Load <= 1'b0 ;
+        #5  x.P = 4'b0011;
+
+        #8  x.Enable <= 1'b0;
+        #15 x.Enable <= 1'b1;
+
+        
+        #16 x.Load <= 1'b1 ;
+        #9  x.Load <= 1'b0 ;
     end
 
     /*  
@@ -83,16 +93,15 @@ module test (count_ifc x);
 endmodule
 
 
-module ConcurrentAssertionExample (
+module conc_disable(
     input logic clk,
     input logic a,
     input logic b
 );
 
-    // Property definition
     property prop_concurrent_assertion;
         @(posedge clk) disable iff (!a)     // disable saves evaluating the assertion if a condition is not satisfied
-        a |-> !b;
+            a |-> !b;
     endproperty
 
     // Assertion instantiation
@@ -101,18 +110,18 @@ module ConcurrentAssertionExample (
 endmodule
 
 
-module ConcurrentAssertionExample (
+module sequences(
     input logic clk,
     input logic [1:0] data
 );
 
     // Sequence definitions
     sequence seq_data0_rising_edge;
-        @(posedge clk) data[0];
+        @(posedge clk) data[0]; // data[0] should be high at every posedge
     endsequence
 
     sequence seq_data1_falling_edge;
-        @(negedge clk) data[1];
+        @(negedge clk) data[1]; // data[1] should be high at every negedge
     endsequence
 
     // Assertion instantiation
@@ -122,40 +131,110 @@ module ConcurrentAssertionExample (
 
 endmodule
 
-module example_module;
-    // Define input signals
+module conc_assert_1;
     bit clk;
     bit [3:0] data;
-
-    property p_data_stable;
-        @(posedge clk)
-        (##1 data === data[*4]); // checks if the data signal remains stable for 4 consecutive clock cycles.
-        // data === data #1 data === data #1 data === data #1 data === data
+    /*
+        - Continuous repetition operator [*n], [*m:n]
+            - The expression repeats continuously for the specified range of cycles.
+     */
+    property cont_rep;
+        @(posedge clk) (##1 data == data[*4]); // checks if the data signal remains stable for 4 consecutive clock cycles.
+        // data == data #1 data == data #1 data == data #1 data == data
     endproperty
 
-    assert property (p_data_stable);
+    assert property (cont_rep);
 
 endmodule
 
 
-module ExampleModule;  
+module conc_assert_2;  
   logic clk, reset, data;
   
-  property p1;
+  property delay_op;
     @(posedge clk) disable iff (reset)
       (data == 1) |-> ##[1:3] (data == 0); // Data should remain 0 for 1 to 3 clock cycles after it transitions to 1
       (data == 1) |-> ##[3:$] (data == 0); // Data should remain 0 for at least 3 clock cycles after it transitions to 1
   endproperty
   
-    property p;
-        // if a signal 'a' is high on a given posedge of the clock, the signal 'b' should be high for 3 clock cycles (not necessarily consecutive)
-        // followed by 'c' that should be high after 'b' is high for the third time
+    /*
+        - Go to repetition operator. [->n], [->m:n]
+            - Indicates there's one or more delay cycles between each repetition of the expression (consecutive or non-consecutive).
+            - a[->3] is equivalent to (!a[*0:$] ##1 a) [*3]
+     */
+    property go_to;
         @(posedge clk) a |-> ##1 b[->3] ##1 c;
+        // if a signal 'a' is high on a given posedge of the clock,
+        // the signal 'b' should be high for 3 clock cycles (not necessarily consecutive)
+        // followed by 'c' that should be high after 'b' is high for the third time
     endproperty
         
-    a: assert property(p);
+    /*
+        - Non-consecutive repetition operator.  [=n], [=m:n]
+            -  a[=3] is equivalent to (!a[*0:$] ##1 a ##1 !a[*0:$]) [*3]
+     */
+    property non_consec;
+        (a) |=> (b[=2]##1 c);
+        // if a signal 'a' is high 
+        // there should be two occurrences of b either consecutive or non-consecutive
+        // and then some time later (i.e., next cycle or later) c occurs.
+    endproperty
 
-  // Assertion declaration
-  assert property (p1) else $error("Property p1 failed!");
-  
+    // Assertion declaration
+    assert property(go_to);
+    assert property (delay_op);
+
+endmodule
+
+
+/*
+    - SVA Built in methods 
+        - $rose, $fell, $changed and $stable indicate whether or not the value of an expression has changed between two adjacent clock ticks.
+            - $rose    : new value is 1, and the old value is 0
+            - $fell    : new value is 0, and the old value is nonzero
+            - $stable  : new value is same as old value.
+            - $changed : new value different than old value.
+        - The system function $past returns the value of an expression in a previous clock cycle. 
+*/
+
+module test_modul e;
+    bit a, b=1, rst_n = 1, clk;
+
+    always #5 clk = ~clk;
+
+    initial begin
+        #23 a = 1;
+        #10 a = 0;
+        #15 a = 1;
+    end
+
+    initial begin
+        #3  b = 0;
+        #40 b = 1;
+        #10 b = 0;
+        #45 b = 1;
+    end
+
+    property high;
+        @(posedge clk) $rose(a) |=> a;
+    endproperty
+
+    property low_for_4_cycles ;
+        @(posedge clk) disable iff (!rst_n)
+        $fell (b) |=> $stable (b)[*4]; // $stable should be true for 4 consecutive times.
+    endproperty
+
+    property toggle_every_cycle;
+        @(posedge clk) $changed(a);
+    endproperty
+
+    assert property (high)
+        else $error ("a is not high after rise");
+    
+    assert property(low_for_4_cycles ) 
+        else $error ("b is not low for at least 4 cycles");
+
+    assert property(toggle_every_cycle) 
+        else $error("a does not toggle every cycle");
+
 endmodule
