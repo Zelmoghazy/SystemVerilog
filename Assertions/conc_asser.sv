@@ -131,9 +131,15 @@ module sequences(
 
 endmodule
 
-module conc_assert_1;
-    bit clk;
-    bit [3:0] data;
+module conc_assert_2;  
+  logic clk, reset, data;
+  
+  property delay_op;
+    @(posedge clk) disable iff (reset)
+      (data == 1) |-> ##[1:3] (data == 0); // Data should remain 0 for 1 to 3 clock cycles after it transitions to 1
+      (data == 1) |-> ##[3:$] (data == 0); // Data should remain 0 for at least 3 clock cycles after it transitions to 1
+  endproperty
+
     /*
         - Continuous repetition operator [*n], [*m:n]
             - The expression repeats continuously for the specified range of cycles.
@@ -143,19 +149,6 @@ module conc_assert_1;
         // data == data #1 data == data #1 data == data #1 data == data
     endproperty
 
-    assert property (cont_rep);
-
-endmodule
-
-
-module conc_assert_2;  
-  logic clk, reset, data;
-  
-  property delay_op;
-    @(posedge clk) disable iff (reset)
-      (data == 1) |-> ##[1:3] (data == 0); // Data should remain 0 for 1 to 3 clock cycles after it transitions to 1
-      (data == 1) |-> ##[3:$] (data == 0); // Data should remain 0 for at least 3 clock cycles after it transitions to 1
-  endproperty
   
     /*
         - Go to repetition operator. [->n], [->m:n]
@@ -181,6 +174,7 @@ module conc_assert_2;
     endproperty
 
     // Assertion declaration
+    assert property (cont_rep);
     assert property(go_to);
     assert property (delay_op);
 
