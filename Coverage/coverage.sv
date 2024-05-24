@@ -148,6 +148,74 @@ module test(busifc.tb ifc);
 		}
 	endgroup
 
+	covergroup CovPort9();
+		CP1 : coverpoint tr.k;
+		{
+			option.auto_bin_max = 8;
+			ignore_bins high = {[6:15]}; // 5 uppermost bins are ignored.
+		}
+	endgroup
+
+	covergroup CovPort9();
+		CP1 : coverpoint tr.k;
+		{
+			// If the testbench generates a value in those bins, an error will be issued.
+			illegal_bins high = {[6:15]}; 
+		}
+	endgroup
+
+	covergroup CovPort10();
+		CP1 : coverpoint tr.k;
+		CP2 : coverpoint tr.p;
+		// measures what values were seen for two or more cover points at the same time
+		// The cross construct in SystemVerilog records the combined values of two or more cover points in a group.
+		cross CP1, CP2;
+	endgroup
+
+	covergroup CovKind();
+		CP1: coverpoint tr.p;
+		{
+			bins port[] = {[0:$]};
+		}
+
+		CP2: coverpoint tr.k
+		{
+			bins zero   = {0};
+			bins low    = {[1:3]};
+			bins high[] = {[8:$]};
+			bins misc   = default;
+		}
+
+		/*
+			With cross coverage, you specify the cover point with binsof 
+			and the set of values with intersect so that a single ignore_bins 
+			construct can sweep out many individual bins
+		 */
+		cross CP1,CP2
+		{
+			ignore_bins t1 = binsof(CP1) intersect {7};
+			ignore_bins t2 = binsof(CP1) intersect {0} && binsof(CP2) intersect {[9:11]};
+			ignore_bins t3 = binsof(CP2.low);
+		}
+	endgroup : CovKind
+
+	// a generic cover group where you can specify a few unique details when you instantiate it.
+	// The cover points are passed by reference, while the other arguments are passed as value
+	covergroup CovPort(ref bit[2:0] port, input int mid);
+		coverpoint port{
+			bins lo = {[0:mid-1]};
+			bins hi = {[mid:$]};
+		}
+		
+	endgroup : CovPort
+
+
+	covergroup CovKind2() @ifc.clk;  // here the sampling occurs based on the clock edge of the clocking block.
+		// no need for using sample() function
+		CP1 : coverpoint tr.k;
+	endgroup : CovKind2
+
+
 	initial begin
 		CovPort xyz;
 		// Allocate memory for covergroup and class
@@ -229,3 +297,34 @@ endmodule
   	  The number of bins created implicitly can be controlled by auto_bin_max parameter
 
 */
+
+
+// Triggering on a SV Assertion
+
+module test(busifc.tb ifc);
+	event ready; // event that will be triggered by an assertion
+	class Transaction;
+		rand bit [2:0] p;
+		rand bit [3:0] k;
+	endclass : Transaction
+
+	Transaction tr;
+
+	// Event triggering occurrence can be recognized by using the event control "@".
+	covergroup CovKind @(ready); // sampling occurs based on the event triggered by an assertion
+		CP1: coverpoint tr.k;		
+	endgroup : CovKind
+
+	initial begin
+		CovKind xyz;
+		xyz = new();
+		tr  = new();
+
+		repeat (20) begin 
+			// A named event can be triggered explicitly using "->".
+			assert (tr.randomize) -> ready; // assertion triggers the event when the randomization succeeds
+		end
+		running = 0;
+		$display("Coverage = %.2f%%",xyz.get_coverage());
+	end
+endmodule
