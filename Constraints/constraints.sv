@@ -2,7 +2,7 @@
     -   A constraint is just a set of relational expressions that must be true for the chosen
         value of the variables.
 
-    -   constraint expression is grouped using curly braces:{} 
+    -   constraint expression is grouped using curly braces:{}. 
 
     -   Inside the constraint, we use {}, rather than begin … end
 
@@ -21,54 +21,88 @@
         all random variables are solved concurrently. Adding or removing a constraint on
         any one variable affects the value chosen for all variables that are related directly
         or indirectly.
+        
     -   At run-time. you can use the built-in constraint_mode() routine to turn constraints on and off.
  */
+// --------------------------------------------------------------------------------------------------------------------
+
 
 class Stim;
     const bit [31:0] CONGEST_ADDR = 42;
     typedef enum {READ, WRITE, CONTROL} stim_e;
 
-    randc stim_e kind;
-    rand bit [31: 0] len, src, dst;
+    randc stim_e kind; // rand cyclic -> repeat values only when all possible values are exhausted
+    rand  bit [31: 0] len, src, dst;
     randc bit congestion_test;
 
-    // Constraint
-    constraint c_stim{
-        // there can be a maximum of only one relational operator <, <=, = =, >=, or > in an expression
+    // Constraint block
+    constraint c_stim
+    {
+        // there can be a maximum of only one relational operator <, <=, = =, >=, or > in a single expression
         len < 1000;
         len > 0;
-        // you can use an if statement to change the constraints according to some conditions.
+        // you can use an if statement to change the constraints according to some conditions (note : using braces).
         if(congestion_test){
-            dst inside {[CONGEST_ADDR+50:CONGEST_ADDR+100]};
+            dst inside {[CONGEST_ADDR+50:CONGEST_ADDR+100]}; // between the brackets we can add (values, intervals, array)
             src == CONGEST_ADDR;
-        }else
+        }else{
             src inside {0, [2:10], [100:107], [500:$]};
+        }
     }
 endclass
 
 program test;
+    // Instantiate the class
     Stim s;
+
     initial begin
+        // Allocate memory for class object.
         s = new();
+
         for (int i = 1; i <= 5; i++) begin
+            // s.randomize(null) -> to check if there is a conflicting constraint.
             assert (s.randomize())
                 else $fatal("Conflicting constraints");
-            $display(s);
+            // Displaying class example : '{CONGEST_ADDR:'h2a, kind:CONTROL, len:'hd2, src:'h2a, dst:'h68, congestion_test:'h1} -> prints all members
+            $display(s); 
         end
     end
 endprogram
 
+// --------------------------------------------------------------------------------------------------------------------
+
+class constraint_test;
+    rand logic [15 :0] r, s, t;
+    constraint c_1 
+    {
+        unique{r,s,t}; // they must all be different
+    }
+endclass
+
+program test;
+    constraint_test y;
+    initial begin
+        y = new();
+        for (int i = 1; i <= 10; i ++) begin
+            assert (y.randomize())
+                else $fatal(0 , "Problem in constraints");
+            $display("r = %0d, s = %0d, t = %0d", y.r, y.s, y.t);
+        end 
+    end
+endprogram
+
+// --------------------------------------------------------------------------------------------------------------------
 
 /*
-    Weighted Distribution 
-    - The dist operator allows you to create weighted distributions so that 
-      some values are chosen more often than others.
+                    ** Weighted Distribution **
+    - The dist operator allows you to create weighted distributions 
+      so that some values are chosen more often than others.
     - The dist operator takes a list of values and weights,
       separated by the “:=” or the “:/” operator.
     - The weights are not percentages and do not have to add up to 100.
-    - The := operator specifies that the weight is the same 
+    - The ":=" operator specifies that the weight is the same 
       for every specified value in the range.
-    - The :/ operator specifies that the weight is to be 
+    - The ":/" operator specifies that the weight is to be 
       equally divided between all the values of the range.
     - SystemVerilog supports two implication operators, “->” and 
       “if-else” in constraint definition
@@ -79,8 +113,7 @@ class weighted;
 
     // constraint
     constraint c_dist {
-        src dist {0:=40, [1:3]:=60};
-        // [Total = 40+60+60+60 = 220]
+        src dist {0:=40, [1:3]:=60};         // [Total = 40+60+60+60 = 220]
         dst dist {0:/40, [1:3]:/60};
         // dst 0 -> weight 40/100
         // dst 1 = dst 2 = dst 3 -> weight = 60/3 = 20
@@ -98,6 +131,8 @@ program test;
         end
     end
 endprogram
+
+// --------------------------------------------------------------------------------------------------------------------
 
 /* Variable Distribution Weights */
 
@@ -122,8 +157,15 @@ class BusOp;
     constraint c_len_rw {
         if(op == READ){
             len inside {[BYTE:LWRD]}
-        }else
+        }else{
             len == LWRD;
+        }
+
+        // or
+
+        (op == READ) -> len inside {[BYTE:LWRD]};
+        (op != READ) -> len == LWRD;;
+
     }
 endclass
 
@@ -145,9 +187,9 @@ program test;
     end
 endprogram
 
+// --------------------------------------------------------------------------------------------------------------------
 
 /* Bidirectional Constraints */
-
 class random;
     rand logic [15 :0] r, s, t;
     // constraint blocks are declarative code, all active at the same time.
@@ -157,6 +199,8 @@ class random;
         s == r ;
         t <  30;  // can be any value in the range [0:29]
         s >  25;  // s is greater than 25 But at the same time s is equal to r, so it can only be (26,27,27)
+
+        solve t before r; // set constraint solving order
     }
 endclass
 
@@ -171,6 +215,8 @@ program test;
         end 
     end
 endprogram
+
+// --------------------------------------------------------------------------------------------------------------------
 
 /* Controlling Multiple Constraint Blocks */
 
@@ -191,15 +237,23 @@ program test;
         assert(p.randomize());
         $display("Length = %0d", p.length);
 
-        //Disable all constraints
+        // Disable all constraints
         p.constraint_mode(0);
         // Enable short constraint
         p.c_short.consraint_mode(1);
+        // checking value
+        if(p.c_short.consraint_mode())
+            $display("Short constraint is enabled.");
+        else
+            $display("Short constraint is disabled.");
 
         assert(p.randomize());
         $display("Length = %0d", p.length);
     end
 endprogram
+
+// --------------------------------------------------------------------------------------------------------------------
+
 
 /*
     Constraining a Constraint 
@@ -217,7 +271,7 @@ program test;
         t = new();
         for (int i=1; i <= 10; i ++) begin
             // addr is 50-100, 1000-1500, data < 10
-            assert (t.randomize() with {
+            assert (t.randomize() with {            // Inline constraining 
                         addr >= 50; 
                         addr <= 1500;
                         data < 10;
@@ -238,6 +292,7 @@ program test;
     end 
 endprogram
 
+// --------------------------------------------------------------------------------------------------------------------
 
 /* Constraining Array and Queue Elements */
 
@@ -261,5 +316,70 @@ program test;
             assert(a.randomize());
             $display("Sum = %0d, Size = %0d, Array = ", a.len, a.len.size,a.len);
         end
+    end
+endprogram
+
+// --------------------------------------------------------------------------------------------------------------------
+
+class constraint_soft;
+    rand logic [15 :0] r, s, t;
+    constraint c_1 
+    {
+        soft r == s; // If this constraint is conflicting with another constraint, ignore it
+        soft r == 5; // If two conflicting soft constraints , last one is considered
+        r > 20;
+    }
+endclass
+
+program test;
+    constraint_soft y;
+    initial begin
+        y = new();
+        for (int i = 1; i <= 10; i ++) begin
+            assert (y.randomize())
+                else $fatal(0 , "Problem in constraints");
+            $display("r = %0d, s = %0d, t = %0d", y.r, y.s, y.t);
+        end 
+    end
+endprogram
+
+// --------------------------------------------------------------------------------------------------------------------
+
+class static_class;
+    // static member shared between all objects of the class.
+    static rand logic [15 :0] r, s, t;
+    static constraint c_1 
+    {
+        r > 20;
+        s < r;
+        t > s ;
+    }
+endclass
+
+program test;
+    static_class x;
+    static_class y;
+    static_class z;
+
+    initial begin
+        x = new();
+        y = new();
+        z = new();
+
+        x.r = 5;
+        y.r = 6;
+        y.r = 7;
+
+        $display(x.r); // 7
+        $display(y.r); // 7
+        $display(z.r); // 7
+
+        x.c_1.consraint_mode(0); // since constraint is static , closing it for object x also closes it for y and z
+
+        for (int i = 1; i <= 10; i ++) begin
+            assert (y.randomize())
+                else $fatal(0 , "Problem in constraints");
+            $display("r = %0d, s = %0d, t = %0d", y.r, y.s, y.t);
+        end 
     end
 endprogram
