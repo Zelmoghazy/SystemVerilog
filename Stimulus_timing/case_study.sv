@@ -16,17 +16,17 @@ interface intf (input clk);
 
     // clocking block for testbench
     // Any signal in a clocking block is now driven or sampled synchronously
-    clocking cb @(posedge clk) ;
+    clocking cb@(posedge clk);
         default input #10ns output #2ns;
 
-        output read,enable,addr;
+        output read, enable, addr;
         input data;
     endclocking
 
     // Modport Declaration
     modport dut(input read, enable, addr, output data);
     // Synchronous testbench modport, add timing constraints in addition to access restrictions.
-    modport tb (clocking cb); 
+    modport tb (clocking cb, output data); 
 
 endinterface :intf
 
@@ -53,16 +53,17 @@ module testbench (intf xyz);
     logic [7:0] cbdata;
 
     initial begin
-        xyz.cb.read   <= 1;       // driving a synchronous signal, according to timing constraints in clocking block
-        xyz.cb.enable <= 1;       // driving a synchronous signal, according to timing constraints in clocking block
-        xyz.cb.addr   <= 70;      // driving a synchronous signal, according to timing constraints in clocking block
+        xyz.cb.read     <= 1;       // driving a synchronous signal, according to timing constraints in clocking block
+        xyz.cb.enable   <= 1;       // driving a synchronous signal, according to timing constraints in clocking block
+        xyz.cb.addr     <= 70;      // driving a synchronous signal, according to timing constraints in clocking block
 
         #30 xyz.cb.addr <= 150; 
-        #25 xyz.data    <= 67;    // disturbing the DUT data, notice that its reflected at once.
+        #25 xyz.data    <= 67;      // disturbing the DUT data, notice that its reflected at once.
         #40 xyz.cb.addr <= 5;
     end
+
     always @(xyz.cb)
-        cbdata = xyz.cb.data;     // get the sampled data
+        cbdata = xyz.cb.data;       // get the sampled data
 endmodule
 
 
@@ -70,9 +71,9 @@ module top;
     bit clk = 0;
     always #20 clk = ~clk;
 
-    intf i1(clk);
-    memory m1(i1.dut);
-    testbench(i1.tb);
+    intf      i1(clk);
+    memory    m1(i1.dut);
+    testbench t1(i1.tb);
 
     initial begin
         $dumpfile("uvm.vcd");
