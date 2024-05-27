@@ -2,16 +2,18 @@
     - Assertions are pieces of code that check the relationships
       between design signals, either once or over a period of time.
 
-    - Assertions are instantiated similarly to other design blocks and are 
-      active for the entire simulation  
+    - Assertions are instantiated similarly to other design blocks 
+      and are active for the entire simulation  
 
     - The Immediate Assertion :
-        - If the expression evaluates to X, Z or 0, then it is interpreted as being false and
-          the assertion is said to fail.
+        - If the expression evaluates to {X, Z, 0}, then it is 
+          interpreted as being false and the assertion is said to "fail".
 
-        - Otherwise, the expression is interpreted as being true and the assertion is said to pass.
+        - Otherwise, the expression is interpreted as being true 
+          and the assertion is said to "pass".
 
-        - An immediate assertion has optional "then" and "else" clauses to create a custom error message.
+        - An immediate assertion has optional "then" and "else" clauses
+          to create a custom error message.
  */
 
 // Interface
@@ -47,12 +49,12 @@ module test (count_ifc x);
         x.Enable <= 1'b1 ;
         x.Load   <= 1'b0;
 
+        // Enable Master Reset    
         #3 x.MR<= 1'b1;
-
 
         // Immediate assertion : Check that reset is an asynchronous reset
         assertion1: assert(x.Q == 4'b0000)
-            $display("The output value is correct");
+            $display("The output value is correct"); // display on assertion pass
         else
             $fatal("The reset is not synchronous");  // Stop execution at this point.
 
@@ -71,9 +73,11 @@ module top;
     always #5 clk <= ~clk;
 
     // Instantiate interface
-    count_ifc ifc (clk);
+    count_ifc ifc(clk);
+
     // Instantiate DUT
     decade_counter u1(ifc.dut);
+
     // Instantiate TB
     test u2 (ifc.driver);
 
@@ -84,13 +88,13 @@ module top;
     end
 endmodule
 
-/* Severity System Tasks */
-module test_module ;
+/* Severity System Tasks (Logging Functions) */
+module logging_functions;
     initial begin
-        #5 $info("Starting simulation...") ;
-        #5 $warning("This is a warning message...") ;
-        #5 $error("This is an error message.") ;        // default in assertions
-        #5 $fatal("This is a fatal error message.") ;   // Simulation will terminate here.
-        #5 $info("Simulation ended.") ;                 // This will not be executed due to the previous $fatal
+        #5 $info("Starting simulation...");
+        #5 $warning("This is a warning message...");
+        #5 $error("This is an error message.");        // default in assertions
+        #5 $fatal("This is a fatal error message.");   // Simulation will terminate here.
+        #5 $info("Simulation ended.");                 // This will not be executed due to the previous $fatal
     end
 endmodule
