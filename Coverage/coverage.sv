@@ -109,7 +109,7 @@ module test(busifc.tb ifc);
 
 
 	covergroup CovPort4();
-		CP1 : coverpoint tr.k;
+		CP1 : coverpoint tr.k
 		{
 			bins zero = {0};		// 1 bin for value = 0
 			bins low  = {[1:3],5};  // 1 bin for the values 1,2,3,5
@@ -232,14 +232,27 @@ module test(busifc.tb ifc);
 	endgroup : CovPort
     // --------------------------------------------------------------------
 
+	covergroup CovPort2(ref bit[2:0] port, input int mid);
+        option.per_instance = 1; // print coverage report of each instance seperately.
+		coverpoint port{
+			bins lo = {[0:mid-1]};
+			bins hi = {[mid:$]};
+		}
+	endgroup : CovPort
+    // --------------------------------------------------------------------
 
 
-	covergroup CovKind2() @ifc.clk;  // here the sampling occurs based on the clock edge of the clocking block.
+	covergroup CovKind2() @(ifc.clk);  // here the sampling occurs based on the clock edge of the clocking block.
 		// no need for using sample() function
 		CP1 : coverpoint tr.k;
 	endgroup : CovKind2
     // --------------------------------------------------------------------
 
+    // Conditional Coverage disable triggering
+	covergroup CovKind21() @(ifc.clk) disable iff(!tr.reset);
+		CP1 : coverpoint tr.p 
+	endgroup
+    // --------------------------------------------------------------------
 
 
 	initial begin
@@ -325,10 +338,11 @@ endmodule
 */
 
 
-// Triggering on a SV Assertion
+// -------------------------------------------------------------------------
 
+// Triggering on a SV Assertion
 module test(busifc.tb ifc);
-	event ready; // event that will be triggered by an assertion
+	event ready;            // event that will be triggered by an assertion
 	class Transaction;
 		rand bit [2:0] p;
 		rand bit [3:0] k;
