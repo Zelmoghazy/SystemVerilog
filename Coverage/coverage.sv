@@ -64,17 +64,18 @@ module test(busifc.tb ifc);
 	endclass
 
 	Transaction tr;
-
 	// Covergroup
 	covergroup CovPort();
 		// We want to test the bus with all possible values of the port number
 		CP1 : coverpoint tr.p;
 	endgroup : CovPort
+    // --------------------------------------------------------------------
 
 	covergroup CovPort2();
 		// option.auto_bin_max specifies the maximum number of bins to automatically create.
 		CP1 : coverpoint tr.p {option.auto_bin_max = 2;};
 	endgroup
+    // --------------------------------------------------------------------
 
 	covergroup CovPort3();
 		// this applies to all the cover points in the group.
@@ -82,6 +83,8 @@ module test(busifc.tb ifc);
 		CP1 : coverpoint tr.p;
 		CP2 : coverpoint tr.d;
 	endgroup
+    // --------------------------------------------------------------------
+
 
 	covergroup CovPort3();
 		// You can sample expressions
@@ -102,6 +105,8 @@ module test(busifc.tb ifc);
 		// The fix is to define the number of bins generated explicitly
 		{bins test_bin[] = {[0:22]};}
 	endgroup
+    // --------------------------------------------------------------------
+
 
 	covergroup CovPort4();
 		CP1 : coverpoint tr.k;
@@ -117,17 +122,23 @@ module test(busifc.tb ifc);
 			  automatically creates bins, and it ignores values that do not fall into a predefined bin.
 		 */
 	endgroup
+    // --------------------------------------------------------------------
 
+    // Conditional Coverage
 	covergroup CovPort5();
 		// You can use the iff keyword to add a condition to a cover point.
 		CP1 : coverpoint tr.p iff(!tr.reset);
 	endgroup : CovPort5
+    // --------------------------------------------------------------------
+
 
 	covergroup CovPort6();
 		// For enumerated types, SystemVerilog creates a bin for each value.
 		// If you want to group multiple values into a single bin, you have to define your own bins
 		CP1 : coverpoint tr.pstate;
-	endgroup	
+	endgroup
+    // --------------------------------------------------------------------
+
 
 	covergroup CovPort7();
 		CP1 : coverpoint tr.k;
@@ -137,16 +148,20 @@ module test(busifc.tb ifc);
 			wildcard bins odd  = {4'b???1};
 		}
 	endgroup
+    // --------------------------------------------------------------------
+
 
 	covergroup CovPort8();
 		CP1 : coverpoint tr.k;
-		/*  you can let SystemVerilog automatically create bins, and then use ignore_bins 
+		/*  
+            you can let SystemVerilog automatically create bins, and then use ignore_bins 
 			to tell which values to exclude from functional coverage calculation.
 		 */
 		{
 			ignore_bins high = {[6:15]}; // excludes the last 10 bins,
 		}
 	endgroup
+    // --------------------------------------------------------------------
 
 	covergroup CovPort9();
 		CP1 : coverpoint tr.k;
@@ -155,6 +170,7 @@ module test(busifc.tb ifc);
 			ignore_bins high = {[6:15]}; // 5 uppermost bins are ignored.
 		}
 	endgroup
+    // --------------------------------------------------------------------
 
 	covergroup CovPort9();
 		CP1 : coverpoint tr.k;
@@ -163,6 +179,8 @@ module test(busifc.tb ifc);
 			illegal_bins high = {[6:15]}; 
 		}
 	endgroup
+    // --------------------------------------------------------------------
+
 
 	covergroup CovPort10();
 		CP1 : coverpoint tr.k;
@@ -171,6 +189,8 @@ module test(busifc.tb ifc);
 		// The cross construct in SystemVerilog records the combined values of two or more cover points in a group.
 		cross CP1, CP2;
 	endgroup
+    // --------------------------------------------------------------------
+
 
 	covergroup CovKind();
 		CP1: coverpoint tr.p;
@@ -198,6 +218,8 @@ module test(busifc.tb ifc);
 			ignore_bins t3 = binsof(CP2.low);
 		}
 	endgroup : CovKind
+    // --------------------------------------------------------------------
+
 
 	// a generic cover group where you can specify a few unique details when you instantiate it.
 	// The cover points are passed by reference, while the other arguments are passed as value
@@ -208,12 +230,16 @@ module test(busifc.tb ifc);
 		}
 		
 	endgroup : CovPort
+    // --------------------------------------------------------------------
+
 
 
 	covergroup CovKind2() @ifc.clk;  // here the sampling occurs based on the clock edge of the clocking block.
 		// no need for using sample() function
 		CP1 : coverpoint tr.k;
 	endgroup : CovKind2
+    // --------------------------------------------------------------------
+
 
 
 	initial begin
