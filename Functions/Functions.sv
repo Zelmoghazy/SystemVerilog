@@ -10,12 +10,12 @@
         end
     endfunction
 
-    - mem_mode: static or automatic (default : static)
-    - return_type: type+length, can't be "wire", can be "void" if you dont want to return (default: logic)
-    - function_name : variable naming rules
-    - direction of arg: input, output, inout
-    - arg_data_type: type+length, cant be "wire" (default: logic)
-    - arg_name: variable naming rules
+    - mem_mode          : static or automatic (default : static)
+    - return_type       : type+length, can't be "wire", can be "void" if you dont want to return (default: logic)
+    - function_name     : variable naming rules
+    - direction of arg  : input, output, inout
+    - arg_data_type     : type+length, can't be "wire" (default: logic)
+    - arg_name          : variable naming rules
 
     * Example :
 
@@ -62,8 +62,8 @@ module functions_1();
      */
     function void print_checksum(const ref bit [31 :0] a []) ;
         // a is a dynamic array of bit [31:0]
-        bit [31 :0] checksum = 0;
-        for (int i=0; i<a.size() ; i++)
+        bit [31:0] checksum = 0;
+        for (int i = 0; i<a.size(); i++)
             checksum ^= a[i]; // XOR of the array elements
         $display("The array checksum is %0d" , checksum) ;
     endfunction
@@ -74,8 +74,8 @@ module functions_1();
     end
 endmodule
 
-/* Note that the default type for the first argument is a single-bit input 
-   Argument type is sticky with respect to the previous argument.
+/*  Note that the default type for the first argument is a single-bit input 
+    Argument type is sticky with respect to the previous argument.
         - task sticky(int a, b); The two arguments are input integers
         - task sticky(ref int array [50] , int a, b); a is ref int and b is ref int
 */

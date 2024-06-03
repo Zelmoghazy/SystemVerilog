@@ -1,6 +1,6 @@
 /* 
-    Your testbench wraps around the design, sending in stimulus and capturing the
-    design's response.
+    Your testbench wraps around the design, sending in stimulus 
+    and capturing the design's response.
  */
 
 module test (input  logic [3:0] Q,
@@ -41,8 +41,8 @@ endmodule
     connected in multiple files.
  */
 module top;
-    logic [3 :0] Q;
-    logic [3 :0] P;
+    logic [3:0] Q;
+    logic [3:0] P;
     logic Load, Enable, MR, CLK ;
 
     decade_counter u1(Q, P, Load, Enable, MR, CLK) ;

@@ -19,6 +19,7 @@ interface intf (input clk);
     clocking cb@(posedge clk);
         default input #10ns output #2ns;
 
+        // Directions from POV of TB
         output read, enable, addr;
         input data;
     endclocking

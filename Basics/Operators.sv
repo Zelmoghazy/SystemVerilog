@@ -44,7 +44,7 @@ module relational;
     end
 endmodule
 
-// Arithmetic 0perators
+// Arithmetic Operators
 module arith;
     reg[7:0] a;
     reg[7:0] b;
@@ -102,8 +102,8 @@ endmodule
 
 // Equality Operators
 module equality;
-    reg [7: 0] a;
-    reg [7 :0] b;
+    reg [7:0] a;
+    reg [7:0] b;
 
     initial begin
         a='b11x0;
@@ -120,7 +120,7 @@ module equality;
         b='b1100;
         $display("Result for %0b == %0b: %0d", a ,b, a == b);
 
-        a='b001100 ;
+        a='b001100;
         b='b1100;
         $display ("Result for %0b == %0b : %0d", a,b, a == b);
 
@@ -142,13 +142,14 @@ endmodule
 
 // Logical Operators 
 module logical;
-    reg [7 : 0] a;
-    reg [7 : 0] b;
+    reg [7:0] a;
+    reg [7:0] b;
 
     initial begin
 
         a='b1110;
         b='b1100;
+        // if result != 0 -> 1
         $display("Result for %0b && %0b: %0d", a, b, a && b) ;
 
         a='b1110;
@@ -161,6 +162,7 @@ module logical;
 
         a='b00x0;
         b='b1110;
+        // cannot be determined 'b00x0 -> x
         $display("Result for %4b && %0b: %0d", a, b, a && b) ;
 
         a='b00z0;
@@ -186,7 +188,7 @@ module logical;
         $display("Result for ! %4b: %0d", a, !a) ;
 
         a='bxxxx ;
-        $display("Result for ! %4b: %Cd", a, !a) ;
+        $display("Result for ! %4b: %0d", a, !a) ;
     end
 endmodule
 
@@ -200,7 +202,7 @@ module bitwise;
 
         a='b1110;
         b='b1100;
-        $display("Result for %0b & %0b: %4b", a ,b ,a & b) ;
+        $display("Result for %0b & %0b: %4b", a, b, a & b) ;
 
 
         a='b11x0;
@@ -235,7 +237,8 @@ module reduction;
 
     initial begin
 
-        a='b11101111;   
+        a='b11101111;
+        // reduce all bits using and function
         $display("Result for & %8b: %0b" , a, &a);
 
         a='b11101x11;  
@@ -245,7 +248,7 @@ module reduction;
         $display("Result for & %8b: %0b", a, &a);
 
         a='b11111011;   
-        $display("Result for ^ %8b: %0b", a, ^a );
+        $display("Result for ^ %8b: %0b", a, ^a);
 
         a='b11001010;   
         $display ("Result for ^ %8b: %0b", a, ^a);
@@ -260,14 +263,14 @@ endmodule
 
 module shift;
 
-    reg [7 :0] data;
+    reg [7:0] data;
     int i;
 
     initial begin
         data = 8'b0000101;
         $display("Original data = %8b", data);
 
-        for (i = 0; i < 9 ; i += 1 ) begin
+        for (i = 0; i < 9; i += 1 ) begin
             $display ("data << %0d = %8b", i, data << i );
         end
 
@@ -290,26 +293,26 @@ endmodule
 module concat;
     reg a;
     reg b;
-    reg [2: 0] c;
-    reg [1: 0] short_result ;
-    reg [7: 0] result ;
+    reg [2:0] c;
+    reg [1:0] short_result ;
+    reg [7:0] result ;
 
     initial begin
         a = 1;
         b = 0;
         c = 3'b110;
 
-        $display("a = %b, b = %b, c = %b", a , b, c);
+        $display("a = %b, b = %b, c = %b", a, b, c);
 
-        short_result = {a ,b};
-        $display("{a,b} = %b" , short_result) ;
+        short_result = {a,b};
+        $display("{a,b} = %b" , short_result);
 
-        result = {b, a, c[1 :0], 3'b001, c[2]};
+        result = {b, a, c[1:0], 3'b001, c[2]};
         $display("{b, a, c[1:0], 3'b001, c[2]} = %b", result);
 
-        $display("{3{c}} = %b", {3{c}}) ;
+        $display("{3{c}} = %b", {3{c}});
 
-        $display("{b,{3{c,a}}} = %b", {b,{3{c ,a}}}) ;
+        $display("{b,{3{c,a}}} = %b", {b,{3{c ,a}}});
     end
 endmodule
 
@@ -361,7 +364,7 @@ endmodule
 module streaming_2() ;
     initial begin
         bit [7:0] array [4] = '{8'h8c, 7'h00, 8'hA4, 8'hFF} ;
-        $display(array) ;
+        $display(array);
 
         int value = {<<8{array}} ;
         $display("%x",value) ;

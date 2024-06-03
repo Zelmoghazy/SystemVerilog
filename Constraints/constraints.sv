@@ -54,16 +54,23 @@ endclass
 program test;
     // Instantiate the class
     Stim s;
+    // Dynamic array
+    int dyn[];
 
     initial begin
         // Allocate memory for class object.
         s = new();
 
+        // Note the difference new(), new[]
+        dyn = new [5];       // Allocate 5 elements
+
+
         for (int i = 1; i <= 5; i++) begin
-            // s.randomize(null) -> to check if there is a conflicting constraint.
+            // s.randomize(null) -> to check if there is a conflicting constraint without randomizing.
             assert (s.randomize())
                 else $fatal("Conflicting constraints");
-            // Displaying class example : '{CONGEST_ADDR:'h2a, kind:CONTROL, len:'hd2, src:'h2a, dst:'h68, congestion_test:'h1} -> prints all members
+            //  Displaying class example (prints all members) : 
+            // '{CONGEST_ADDR:'h2a, kind:CONTROL, len:'hd2, src:'h2a, dst:'h68, congestion_test:'h1} 
             $display(s); 
         end
     end
@@ -73,9 +80,11 @@ endprogram
 
 class constraint_test;
     rand logic [15 :0] r, s, t;
+    int my_array[];
     constraint c_1 
     {
-        unique{r,s,t}; // they must all be different
+        unique{r,s,t};      // they must all be different
+        unique{my_array};   // all element of the array are unique. 
     }
 endclass
 
@@ -97,13 +106,18 @@ endprogram
                     ** Weighted Distribution **
     - The dist operator allows you to create weighted distributions 
       so that some values are chosen more often than others.
+
     - The dist operator takes a list of values and weights,
       separated by the “:=” or the “:/” operator.
+
     - The weights are not percentages and do not have to add up to 100.
+
     - The ":=" operator specifies that the weight is the same 
       for every specified value in the range.
+
     - The ":/" operator specifies that the weight is to be 
       equally divided between all the values of the range.
+
     - SystemVerilog supports two implication operators, “->” and 
       “if-else” in constraint definition
 
@@ -113,11 +127,12 @@ class weighted;
 
     // constraint
     constraint c_dist {
-        src dist {0:=40, [1:3]:=60};         // [Total = 40+60+60+60 = 220]
-        dst dist {0:/40, [1:3]:/60};
+        src dist {0:=40, [1:3]:=60};    // [Total = 40+60+60+60 = 220]
+        dst dist {0:/40, [1:3]:/60};    // [Total = 40 + 60 = 100]        
         // dst 0 -> weight 40/100
         // dst 1 = dst 2 = dst 3 -> weight = 60/3 = 20
     }
+
 endclass
 
 program test;
@@ -164,7 +179,7 @@ class BusOp;
         // or
 
         (op == READ) -> len inside {[BYTE:LWRD]};
-        (op != READ) -> len == LWRD;;
+        (op != READ) -> len == LWRD;
 
     }
 endclass
@@ -222,26 +237,37 @@ endprogram
 
 class Packet;
     rand int length;
-    constraint c_short {length inside {[1:32]};}
-    constraint c_long  {length inside {[1000:1023]};}
+    constraint c_short 
+    {
+        length inside {[1:32]};
+    }
+
+    constraint c_long {
+        length inside {[1000:1023]};
+    }
 endclass
 
-program test;
+program const_mode;
     Packet p;
+
     initial begin
         p = new();
 
         // disable short constraint
         p.c_short.constraint_mode(0);
 
-        assert(p.randomize());
+        assert(p.randomize()); // ignore short constraint
         $display("Length = %0d", p.length);
 
         // Disable all constraints
         p.constraint_mode(0);
         // Enable short constraint
         p.c_short.consraint_mode(1);
-        // checking value
+
+        // Disable randomization of a random variable
+        p.length.rand_mode(0);
+
+        // checking if its enabled or disabled
         if(p.c_short.consraint_mode())
             $display("Short constraint is enabled.");
         else
@@ -256,16 +282,19 @@ endprogram
 
 
 /*
-    Constraining a Constraint 
+    Constraining a Constraint (with clause)
         - SystemVerilog allows you to add an extra constraint using randomize () with.
         - inside the with{} statement, SystemVerilog uses the scope of the class.
 */
 class Transaction;
     rand bit [31:0] addr, data;
-    constraint c1 {addr inside{[0:100] , [1000:2000]};}
+    constraint c1 
+    {
+        addr inside{[0:100] , [1000:2000]};
+    }
 endclass
 
-program test;
+program constraint_with;
     Transaction t;
     initial begin
         t = new();
@@ -279,7 +308,7 @@ program test;
 
             $display("Addr = %0d, Data= %0d:", t.addr, t.data) ;
 
-            // force addr to a specific value, data> 10
+            // force addr to a specific value, data > 10
             assert (t.randomize() with {
                         addr = 2000;
                         data > 10;
@@ -295,26 +324,32 @@ endprogram
 // --------------------------------------------------------------------------------------------------------------------
 
 /* Constraining Array and Queue Elements */
+class const_array;
+    rand int my_array[];
 
-class good;
-    rand int len[];
-    constraint c_len{
-        // constrain individual elements of an array 
-        foreach (len[i])
-            len[i] inside {[1:255]};
-        len.sum < 1024;
-        len.size() inside {[1:8]};
+    constraint c_len
+    {
+        my_array.size() inside {[1:8]};
+        my_array.sum < 1024;
+        // constrain individual elements of an array, note: brackets
+        foreach (my_array[i]){
+            if(i>0){
+                my_array[i] < my_array[i-1]; // descending order
+            }
+            my_array[i] inside {[1:255]};
+        }
+        unique {my_array};
     }
 endclass
 
 program test;
-    good a;
+    const_array a;
 
     initial begin
         a = new();
         for(int i = 1; i <= 10; i++) begin
             assert(a.randomize());
-            $display("Sum = %0d, Size = %0d, Array = ", a.len, a.len.size,a.len);
+            $display("Sum = %0d, Size = %0d, Array = ", a.my_array.sum, a.my_array.size,a.my_array);
         end
     end
 endprogram
@@ -325,8 +360,8 @@ class constraint_soft;
     rand logic [15 :0] r, s, t;
     constraint c_1 
     {
-        soft r == s; // If this constraint is conflicting with another constraint, ignore it
-        soft r == 5; // If two conflicting soft constraints , last one is considered
+        soft r == s; // If this constraint is conflicting with another hard constraint, ignore it.
+        soft r == 5; // If two conflicting soft constraints, last one is considered.
         r > 20;
     }
 endclass
@@ -372,7 +407,7 @@ program test;
 
         $display(x.r); // 7
         $display(y.r); // 7
-        $display(z.r); // 7
+        $display(z.r); // 7 -> static member shared between objects
 
         x.c_1.consraint_mode(0); // since constraint is static , closing it for object x also closes it for y and z
 
@@ -383,3 +418,23 @@ program test;
         end 
     end
 endprogram
+
+// ------------------------------------------------------------------------------------------------
+
+class Transaction;
+    rand bit [4:0] op_code;
+    rand int a,b;
+
+    // override existing empty pre_randomize and post randomize methods
+    // called before randomize()
+    function void pre_randomize();
+        // Control randomization
+        $display("Called before randomization");
+    endfunction
+
+    // called after randomize()
+    function void post_randomize();
+        $display("Called after randomization");
+    endfunction
+
+endclass

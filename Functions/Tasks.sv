@@ -34,7 +34,7 @@ endmodule
 
 module task_2 () ;
     /*  The direction and type default to "input logic“. */
-    task mytask(output reg [31 :0] x,input  reg [31 :0] y);
+    task mytask(output reg [31:0] x, input  reg [31:0] y);
         x = y<<2 ;
     endtask
 
@@ -47,8 +47,8 @@ module task_2 () ;
 endmodule
 
 module tasks_3() ;
-    task many(input int a=1 , b=2 , c=3 , d=4) ;
-        $display( "%0d %0d %0d %0d" , a, b, c, d) ;
+    task many(input int a=1 , b=2 , c=3 , d=4);
+        $display( "%0d %0d %0d %0d", a, b, c, d);
     endtask
 
     initial begin

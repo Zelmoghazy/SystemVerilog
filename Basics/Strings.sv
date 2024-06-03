@@ -16,7 +16,7 @@ module test () ;
         $display(s.getc(0)) ;    // Display: 73 ('I')
         $display(s.tolower()) ; // Display: ieee
 
-        s.putc (s.len()-1, "-") ; // change' ' ->
+        s.putc(s.len()-1, "-") ; // change ' ' -> '-'
         
         s = {s, "p1800"}; // "IEEE-P1800"
         

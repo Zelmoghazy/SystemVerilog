@@ -4,18 +4,24 @@ module tb;
         int fd;
         // open file with read permission
         fd = $fopen("./file.txt","r");
-        if(fd) $display("File was opened successfully : %0d",fd);
-        else   $display("File was not opened successfully : %0d",fd);
+        if(fd) 
+            $display("File was opened successfully : %0d", fd);
+        else
+            $display("File was not opened successfully : %0d", fd);
 
         // open file with write permission, overwrite if it exists
         fd = $fopen("./file.txt","w");
-        if(fd) $display("File was opened successfully : %0d",fd);
-        else   $display("File was not opened successfully : %0d",fd);
+        if(fd)
+            $display("File was opened successfully : %0d", fd);
+        else
+            $display("File was not opened successfully : %0d", fd);
 
         // open file with write permission, append if it exists
         fd = $fopen("./file.txt","a");
-        if(fd) $display("File was opened successfully : %0d",fd);
-        else   $display("File was not opened successfully : %0d",fd);
+        if(fd)
+            $display("File was opened successfully : %0d",fd);
+        else
+            $display("File was not opened successfully : %0d",fd);
 
         // close the file
         $fclose(fd);

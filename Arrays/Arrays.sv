@@ -53,8 +53,8 @@ endmodule
 
 module arrays_3 () ;
     initial begin
-        bit [31 :0] src [5];
-        bit [31 :0] dst [5];
+        bit [31:0] src [5];
+        bit [31:0] dst [5];
 
         /* The SystemVerilog function $size returns the size of the array. */
         for (int i = 0; i < $size(src); i++)
@@ -64,7 +64,7 @@ module arrays_3 () ;
         foreach(dst[j]) // j is automatically declared
             dst[j] = src[j] * 2;
         
-        foreach (src [j])
+        foreach(src [j])
             $display("src[%0d]= %b = %0d    dst[%0d] = %b = %0d",j,src[j],src[j],j,dst[j],dst[j]);
     end
 endmodule
@@ -113,8 +113,8 @@ endmodule
 */
 module arrays_5 ();
     initial begin
-        bit [31 :0] src [5] = '{0, 1, 2, 3, 4};
-        bit [31 :0] dst [5] = '{5, 4, 3, 2, 1};
+        bit [31:0] src [5] = '{0, 1, 2, 3, 4};
+        bit [31:0] dst [5] = '{5, 4, 3, 2, 1};
 
         // Aggregate compare the two arrays
         if (src==dst)
@@ -155,8 +155,8 @@ module arrays_7;
   initial begin
     dt_bit = '{12'h012,12'h345,12'h678,12'h9AB};
     
-    for(int i =0; i<$size(dt_bit); i++)
-    /* print out first byte only */
+    for(int i = 0; i < $size(dt_bit); i++)
+    /* print out first 4-bits only */
       $display("%x",dt_bit[i][3:0]);
     
     foreach(dt_bit[i])

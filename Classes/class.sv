@@ -40,7 +40,7 @@ module top;
 
     initial begin
         widget w; // declare an object of type widget
-        int num = $urandom_range(20,40); // generate a random int between (20 - 40)
+        int num = $urandom_range(20,40); // generate an unsigned random int between (20 - 40)
         
         for(int i = 0; i<num; i++) begin
             w = new();

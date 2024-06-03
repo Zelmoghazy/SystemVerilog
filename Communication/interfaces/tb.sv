@@ -29,3 +29,21 @@ module test (count_ifc x);
         #9  Load <= 1'b0 ;
     end
 endmodule
+
+module top;
+    bit clk;
+    always #5 clk <= ~clk;
+
+    // Interface
+    count_ifc ifc(clk);
+    // DUT
+    decade_counter u1(ifc) ;
+    // TB
+    test u2(ifc);
+    
+    initial begin
+        $dumpfile("counter.vcd") ;
+        $dumpvars;
+        #200 $finish;
+    end
+endmodule

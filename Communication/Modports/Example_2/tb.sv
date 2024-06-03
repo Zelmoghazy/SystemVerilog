@@ -27,7 +27,7 @@ module test (count_ifc x);
     initial begin
         x.P      <= 4'b0111;
         x.MR     <= 1'b0;
-        x.Enable <= 1'b1 ;
+        x.Enable <= 1'b1;
         x.Load   <= 1'b0;
 
         #3 x.MR<= 1'b1;

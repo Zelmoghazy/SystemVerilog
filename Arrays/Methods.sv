@@ -33,17 +33,17 @@ module reduction_2 () ;
         count = d.sum with (int'(item > 7));
         $display(count) ;
     
-        total = d.sum with ((item > 7) * item) ;
-        $display(total) ;
+        total = d.sum with ((item > 7) * item);
+        $display(total);
     
         count = d.sum with (int'(item < 8));
-        $display(count) ;
+        $display(count);
     
-        total = d.sum with (item < 8 ? item : 0) ;
-        $display(total ) ;
+        total = d.sum with (item < 8 ? item : 0);
+        $display(total);
     
-        count = d.sum with (int' (item == 4)) ;
-        $display(count) ;
+        count = d.sum with (int' (item == 4));
+        $display(count);
     end
 endmodule
 
@@ -59,7 +59,7 @@ endmodule
 module locator_1();
     int f  [6] = '{1,6,2,6,8,6};  // Fixed array
     int d  []  = '{2,4,6,8,10};   // dynamic array
-    int q  [$] =  {1,3,5,7};
+    int q  [$] =  {1,3,5,7};      // queue
     int tq [$];
 
     initial begin
@@ -84,9 +84,8 @@ endmodule
     - The array locator methods that return an index, such as find_index,
       return a queue of type int, not integer.
     - Your code may not compile if you use the wrong queue type with these statements.
-        - int : 2-state SystemVerilog data type, 32 bit signed integer
+        - int     : 2-state SystemVerilog data type, 32 bit signed integer
         - integer : 4-state Verilog data type, 32 bit signed integer
-
 
  */
 

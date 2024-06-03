@@ -30,7 +30,7 @@ endmodule
 
 module test () ;
     initial begin
-        bit [127 : 0] cmd;
+        bit [127:0] cmd;
         int file, c;
 
         file = $fopen("command.txt", "r");

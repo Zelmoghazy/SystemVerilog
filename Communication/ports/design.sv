@@ -1,6 +1,6 @@
 module decade_counter (output logic [3:0] Q,
                        input  logic [3:0] P,
-                       input logic Load, Enable, MR, CLK);
+                       input  logic Load, Enable, MR, CLK);
     always @(MR) begin
         // asynchronous reset signal MR (Master Reset).
         if (MR)

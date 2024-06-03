@@ -5,7 +5,7 @@
 */
 
 module associative_1();
-// associative array is declared with a data type in square brackets
+    // associative array is declared with a data type in square brackets
     int scoreboard[string];
     // * indicates the array has unspecified index, can be anything
     int a_array1[*] ;
@@ -77,6 +77,7 @@ module associative_3();
             $fscanf(myfile,"%d %s",i,s);    // Read line by line
             switch[s] = i;                  // fill the associative array
         end
+
         $fclose(myfile);                    // close the file after finishing
 
         low = switch["min_address"];
@@ -90,6 +91,6 @@ module associative_3();
         
         // print file contents
         foreach(switch[j])
-            $display("switch[%s] = %0d",j,switch[j]);
+            $display("switch[%s] = %0d", j, switch[j]);
     end
 endmodule

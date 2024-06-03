@@ -14,17 +14,3 @@ module decade_counter (counter_ifc y);
     end
 endmodule                
 
-module top;
-    bit clk;
-    always #5 clk <= ~clk;
-
-    count_ifc ifc(clk);
-    decade_counter u1(ifc) ;
-    test u2(ifc);
-    
-    initial begin
-        $dumpfile("counter.vcd") ;
-        $dumpvars;
-        #200 $finish;
-    end
-endmodule

@@ -18,7 +18,7 @@ module struct_1() ;
                             16'hcccc,
                             32'hdddd_dddd};
 
-        $display ("str = %x %x %x %x " , st.a, st.b, st.c, st.d) ;
+        $display ("str = %x %x %x %x ", st.a, st.b, st.c, st.d) ;
         end
 endmodule
 
@@ -36,7 +36,7 @@ module struct_2 () ;
         bit [7:0] b;
     } pixel_s;
 
-    pixel_s my_pixel;        // stored in 3 long words
+    pixel_s my_pixel;        // stored in 3 long words (each stored in 32-bits regardless of type)
 
     typedef struct packed {
         bit [7:0] r;

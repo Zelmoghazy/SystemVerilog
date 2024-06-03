@@ -6,7 +6,7 @@ interface intf();
     logic [4:0] c;
 
     modport driver (output a, b, input c);
-    modport dut (input a, b, output c);
+    modport dut    (input a, b, output c);
 endinterface
 
 
@@ -20,9 +20,9 @@ module tbench(intf abc);
     initial begin
         abc.a = 6;
         abc.b = 4;
-        $$display("Value of a = %0d, b=%0d", abc.a,abc.b);
+        $display("Value of a = %0d, b=%0d", abc.a,abc.b);
         #5;
-        $display("Sum of a and b = %0d",abc.c);
+        $display("Sum of a and b = %0d", abc.c);
         $finish;
     end
 endmodule

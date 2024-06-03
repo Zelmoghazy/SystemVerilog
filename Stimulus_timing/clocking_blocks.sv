@@ -1,6 +1,6 @@
 /* 
-    - SystemVerilog has several constructs to help you control the timing of the
-      communication.
+    - SystemVerilog has several constructs to help you control the timing 
+      of the communication.
 
     - Module ports and interfaces by default do not specify any timing requirements or
       synchronization schemes between signals.

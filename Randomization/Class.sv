@@ -26,7 +26,7 @@ program test;
         // Randomization only works with 2-state values.
         assert(p.randomize()) // randomize() may fail incase of conflicting constraints.
         else
-            $fatal (0, "Packet: randomize failed"
+            $fatal (0, "Packet: randomize failed")
         $display(p);
     end
 endprogram

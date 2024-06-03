@@ -8,10 +8,10 @@
 module dyn_arrays ();
     // Declare dynamic arrays
     int dyn [];
-    int d2 [];
+    int d2  [];
 
-    int da1[];
-    int da2[];
+    int da1 [];
+    int da2 [];
 
     initial begin
         dyn = new [5];       // Allocate 5 elements
